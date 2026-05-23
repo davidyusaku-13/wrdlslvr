@@ -6,7 +6,9 @@
   "scripts": {
     "setup": "bun run scripts/setup.ts",
     "dev": "bun run --hot src/server.ts",
-    "test": "bun run src/test_solver.ts"
+    "test": "bun run src/test_solver.ts",
+    "wrangler-dev": "bunx wrangler dev",
+    "deploy": "bunx wrangler deploy"
   },
   "devDependencies": {
     "@types/bun": "latest"
