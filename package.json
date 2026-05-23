@@ -1,0 +1,17 @@
+{
+  "name": "wrdlslvr",
+  "module": "src/server.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "setup": "bun run scripts/setup.ts",
+    "dev": "bun run --hot src/server.ts",
+    "test": "bun run src/test_solver.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

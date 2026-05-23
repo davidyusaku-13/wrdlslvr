@@ -1,0 +1,893 @@
+/* ==========================================================================
+   WRDL-SLVR Core Design System & Styling
+   Theme: Cyberpunk Slate / Deep Charcoal Slate Dark Mode
+   ========================================================================== */
+
+:root {
+  /* Harmonious Cyberpunk HSL Color Palette */
+  --bg-base: #070913;
+  --bg-slate-900: #0c0f1d;
+  --bg-slate-800: #12182c;
+  --bg-slate-700: #1d243f;
+  
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-neon-dim: rgba(0, 230, 118, 0.15);
+  --bg-glass: rgba(12, 15, 29, 0.65);
+  
+  /* Text colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  /* Wordle States - Sleek Electric Highlights */
+  --color-green: #00e676;
+  --color-green-glow: rgba(0, 230, 118, 0.35);
+  --color-green-dark: #008f47;
+  
+  --color-yellow: #ffb300;
+  --color-yellow-glow: rgba(255, 179, 0, 0.35);
+  --color-yellow-dark: #b37d00;
+  
+  --color-gray: #334155;
+  --color-gray-dark: #1e293b;
+  
+  --color-empty-border: #475569;
+  --color-empty-active: #38bdf8;
+  --color-empty-active-glow: rgba(56, 189, 248, 0.3);
+  
+  /* Accents & Special Buttons */
+  --color-accent: #8b5cf6;
+  --color-accent-glow: rgba(139, 92, 246, 0.4);
+  --color-accent-dark: #6d28d9;
+  
+  --color-secondary: #0ea5e9;
+  
+  /* Typography */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Reset & Layout */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Background Glowing Blurs */
+.bg-glow {
+  position: absolute;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 1s ease;
+}
+
+.bg-glow-left {
+  top: -10vw;
+  left: -10vw;
+  background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+}
+
+.bg-glow-right {
+  bottom: -10vw;
+  right: -10vw;
+  background: radial-gradient(circle, var(--color-green) 0%, transparent 70%);
+}
+
+/* Core Container Wrapper */
+.app-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+/* Header Styling */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2.2rem;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #fff 30%, var(--text-secondary) 70%, var(--color-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-version {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0;
+  border: 1px solid var(--border-glass);
+  color: var(--color-green);
+  -webkit-text-fill-color: var(--color-green);
+}
+
+.logo-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: -2px;
+}
+
+
+
+/* Main Layout Grid */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
+  flex: 1;
+}
+
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Glassmorphism Cards */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.panel-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 16px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.panel-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Wordle Board Grid */
+.board-column {
+  align-items: center;
+}
+
+.wordle-grid {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.wordle-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.tile {
+  aspect-ratio: 1/1;
+  border: 2px solid var(--color-empty-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  user-select: none;
+  cursor: default;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* Interactive helper state colors */
+.board-column.helper-mode-active .tile {
+  cursor: pointer;
+}
+
+.tile.empty {
+  background: transparent;
+}
+
+.tile.active {
+  border-color: var(--color-empty-active);
+  box-shadow: 0 0 10px var(--color-empty-active-glow);
+}
+
+/* Colored States with Soft Neon Glows */
+.tile.absent {
+  background-color: var(--color-gray-dark);
+  border-color: var(--color-gray);
+  color: var(--text-primary);
+}
+
+.tile.present {
+  background-color: var(--color-yellow-dark);
+  border-color: var(--color-yellow);
+  color: #fff;
+  box-shadow: 0 0 12px var(--color-yellow-glow);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.tile.correct {
+  background-color: var(--color-green-dark);
+  border-color: var(--color-green);
+  color: #fff;
+  box-shadow: 0 0 15px var(--color-green-glow);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Virtual Keyboard */
+.keyboard {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.key {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  background-color: var(--bg-slate-700);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  border-radius: 6px;
+  height: 52px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.key:hover {
+  background-color: var(--color-empty-border);
+}
+
+.key:active {
+  transform: scale(0.95);
+}
+
+.key.wide {
+  flex: 1.5;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+/* Keyboard letter colorizations */
+.key.absent {
+  background-color: var(--bg-slate-900);
+  border-color: var(--color-gray);
+  color: var(--text-muted);
+}
+
+.key.present {
+  background-color: var(--color-yellow-dark);
+  border-color: var(--color-yellow);
+  box-shadow: 0 0 6px rgba(255, 179, 0, 0.2);
+}
+
+.key.correct {
+  background-color: var(--color-green-dark);
+  border-color: var(--color-green);
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.2);
+}
+
+/* Right Column: Solver Sidebar & Recommendations */
+.title-with-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--border-neon-dim);
+  border: 1px solid var(--color-green);
+  color: var(--color-green);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.1);
+}
+
+/* Action Controls Panel */
+.controls-panel {
+  background: var(--bg-slate-900);
+  border: 1px solid var(--border-glass);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.mode-controls {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Sleek Buttons System */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--bg-base);
+  box-shadow: 0 4px 10px rgba(255,255,255,0.08);
+}
+
+.btn-primary:hover {
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(255,255,255,0.15);
+}
+
+.btn-secondary {
+  background: var(--bg-slate-700);
+  color: var(--text-primary);
+  border: 1px solid var(--border-glass);
+}
+
+.btn-secondary:hover {
+  background: var(--color-empty-border);
+}
+
+.btn-accent {
+  background: var(--color-accent-dark);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 4px 10px var(--color-accent-glow);
+  flex: 1.5;
+}
+
+.btn-accent:hover {
+  background: var(--color-accent);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.6);
+}
+
+/* Recommendation Suggestions List */
+.suggestions-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 20px;
+  min-height: 250px;
+}
+
+.suggestions-header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.header-unit {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+.suggestions-list {
+  overflow-y: auto;
+  flex: 1;
+  max-height: 380px;
+}
+
+.suggestions-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Word suggestion item */
+.suggestion-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  align-items: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.word-box {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Word marker badges */
+.word-text {
+  color: var(--text-primary);
+}
+
+.suggestion-item.possible .word-text {
+  color: var(--color-green);
+}
+
+.tag-helper {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 400;
+}
+
+.tag-possible {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: var(--color-green);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.entropy-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.expected-value {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* Sleek Scrollbar */
+.suggestions-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb {
+  background: var(--bg-slate-700);
+  border-radius: 3px;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-empty-border);
+}
+
+/* Interactive Info/Status Overlay box */
+.info-overlay {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  align-items: flex-start;
+}
+
+.info-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--color-accent);
+  margin-top: 1px;
+}
+
+.info-text strong {
+  color: var(--text-primary);
+}
+
+/* App Footer Styling */
+.app-footer {
+  margin-top: auto;
+  padding: 24px 0 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.footer-highlight {
+  color: var(--color-green);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Animations & Micro-interactions
+   ========================================================================== */
+
+/* Tile input pop animation */
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tile.pop {
+  animation: popIn 0.1s ease-out forwards;
+}
+
+/* Tile flip animations */
+@keyframes flipToCorrect {
+  0% { transform: rotateX(0deg); }
+  45% { transform: rotateX(90deg); }
+  55% { transform: rotateX(90deg); }
+  100% {
+    transform: rotateX(0deg);
+    background-color: var(--color-green-dark);
+    border-color: var(--color-green);
+    color: #fff;
+    box-shadow: 0 0 15px var(--color-green-glow);
+  }
+}
+
+@keyframes flipToPresent {
+  0% { transform: rotateX(0deg); }
+  45% { transform: rotateX(90deg); }
+  55% { transform: rotateX(90deg); }
+  100% {
+    transform: rotateX(0deg);
+    background-color: var(--color-yellow-dark);
+    border-color: var(--color-yellow);
+    color: #fff;
+    box-shadow: 0 0 12px var(--color-yellow-glow);
+  }
+}
+
+@keyframes flipToAbsent {
+  0% { transform: rotateX(0deg); }
+  45% { transform: rotateX(90deg); }
+  55% { transform: rotateX(90deg); }
+  100% {
+    transform: rotateX(0deg);
+    background-color: var(--color-gray-dark);
+    border-color: var(--color-gray);
+    color: var(--text-primary);
+  }
+}
+
+.tile.animate-correct {
+  animation: flipToCorrect 0.6s ease-in-out forwards;
+}
+
+.tile.animate-present {
+  animation: flipToPresent 0.6s ease-in-out forwards;
+}
+
+.tile.animate-absent {
+  animation: flipToAbsent 0.6s ease-in-out forwards;
+}
+
+/* Invalid row shake animation */
+@keyframes shakeRow {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-4px); }
+  30%, 60%, 90% { transform: translateX(4px); }
+}
+
+.wordle-row.shake {
+  animation: shakeRow 0.5s ease-in-out;
+}
+
+/* ==========================================================================
+   Phase 2: Retro-Cyberpunk Audio & Range Slider Styles
+   ========================================================================== */
+
+/* Header controls grouping */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Cyberpunk audio button */
+.audio-btn {
+  background: var(--bg-slate-900);
+  border: 1px solid var(--border-glass);
+  color: var(--color-accent);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.audio-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-slate-800);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+.audio-btn:active {
+  transform: scale(0.95);
+}
+
+.audio-btn svg {
+  stroke: currentColor;
+  transition: stroke var(--transition-fast);
+}
+
+
+
+
+
+/* ==========================================================================
+   Phase 4: Simplified Sidebar Panels
+   ========================================================================== */
+
+/* Tab Panels Content visibility */
+.tab-panel-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  animation: popIn 0.2s ease-out forwards;
+}
+
+/* ==========================================================================
+   Phase 5: High-Fidelity Mobile Responsiveness Breakpoints
+   ========================================================================== */
+
+/* Breakpoint for Tablets and Medium Width Displays */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .app-wrapper {
+    padding: 16px;
+  }
+
+  .glass-panel {
+    padding: 18px;
+  }
+
+  .logo-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Breakpoint for Mobile Phones and Small Viewports */
+@media (max-width: 480px) {
+  .app-wrapper {
+    padding: 12px;
+  }
+
+  .glass-panel {
+    padding: 14px;
+    border-radius: var(--radius-md);
+  }
+
+  .logo-title {
+    font-size: 1.5rem;
+  }
+
+  .logo-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .wordle-grid {
+    max-width: 280px;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .wordle-row {
+    gap: 6px;
+  }
+
+  .tile {
+    font-size: 1.45rem;
+    border-radius: 6px;
+  }
+
+  .keyboard {
+    gap: 6px;
+  }
+
+  .keyboard-row {
+    gap: 4px;
+  }
+
+  .key {
+    height: 42px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+  }
+
+  .key.wide {
+    font-size: 0.75rem;
+  }
+
+  .suggestions-container {
+    min-height: 200px;
+    margin-bottom: 16px;
+  }
+
+  .suggestions-header-row {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+  }
+
+  .suggestion-item {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .word-box {
+    gap: 6px;
+  }
+
+  .tag-possible, .tag-helper {
+    font-size: 0.55rem;
+    padding: 1px 3px;
+  }
+
+  .info-overlay {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+}
+
+
+
