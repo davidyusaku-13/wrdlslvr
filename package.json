@@ -6,7 +6,7 @@
   "scripts": {
     "setup": "bun run scripts/setup.ts",
     "dev": "bun run --hot src/server.ts",
-    "test": "bun run src/test_solver.ts",
+    "test": "bun test",
     "wrangler-dev": "bunx wrangler dev",
     "deploy": "bunx wrangler deploy"
   },
