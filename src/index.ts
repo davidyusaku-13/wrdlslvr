@@ -1,4 +1,4 @@
-import { getRecommendations } from "./solver.ts";
+import { handleSolveRequest } from "./solve_handler.ts";
 
 export interface Env {
   ASSETS: {
@@ -7,45 +7,12 @@ export interface Env {
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: any): Promise<Response> {
+  async fetch(request: Request, env: Env, _ctx: unknown): Promise<Response> {
     const url = new URL(request.url);
 
-    // API Route: Calculate solver recommendations
-    if (url.pathname === "/api/solve" && request.method === "POST") {
-      try {
-        const body: any = await request.json();
-        const guesses = body.guesses || [];
-        
-        // Return top 30 recommendations
-        const result = getRecommendations(guesses, 30);
-        return new Response(JSON.stringify(result), {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type"
-          }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: String(err) }), {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*"
-          }
-        });
-      }
-    }
-
-    // CORS preflight requests
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type"
-        }
-      });
+    // Delegate API and CORS preflight requests to the shared handler
+    if (url.pathname === "/api/solve" || request.method === "OPTIONS") {
+      return handleSolveRequest(request);
     }
 
     // Fallback: Serve static assets mapped in wrangler.toml
@@ -54,5 +21,5 @@ export default {
     }
 
     return new Response("Not Found", { status: 404 });
-  }
+  },
 };
