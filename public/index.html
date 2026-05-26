@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WRDL-SLVR // Cyberpunk Entropy Wordle Solver</title>
-  <meta name="description" content="A state-of-the-art information-theoretic Wordle solver and simulator. Leverage entropy metrics to crack Wordle with mathematical precision.">
+  <meta name="description" content="WRDL-SLVR: An entropy-powered Wordle solver that computes optimal guesses by maximizing expected information gain. Interactive board with real-time suggestions, deployable via Cloudflare Workers.">
   
-  <!-- Google Fonts -->
+  <!-- Google Fonts — preconnect + preload for faster first paint -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&family=Fira+Code:wght@400;600&display=swap">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
   
   <!-- Sleek CSS Stylesheet -->
@@ -24,8 +25,8 @@
     <!-- Header -->
     <header class="app-header">
       <div class="logo-container">
-        <h1 class="logo-title" id="app-title">WRDL-SLVR<span class="logo-version">v1.0</span></h1>
-        <p class="logo-subtitle">Information-Theoretic Wordle Engine</p>
+        <h1 class="logo-title" id="app-title">WRDL-SLVR<span class="logo-version">v1.1</span></h1>
+        <p class="logo-subtitle">Entropy-Powered Wordle Solver</p>
       </div>
 
       <!-- Audio Selector -->
@@ -96,7 +97,7 @@
           <div class="info-overlay" id="status-info-box">
             <div class="info-icon">🛈</div>
             <div class="info-text" id="status-info-text">
-              Opening solver precomputed with 6.19 bits of maximum entropy. The best mathematical opener is <strong>TARES</strong>.
+              Entropy-powered solver ready. Type a guess and press Enter to get optimal recommendations.
             </div>
           </div>
         </div>
@@ -105,7 +106,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>Built with <span class="footer-highlight">Bun</span> and Vanilla JavaScript. Inspired by 3Blue1Brown.</p>
+      <p>Entropy-powered Wordle solver. Built with <span class="footer-highlight">Bun</span> + <span class="footer-highlight">Cloudflare Workers</span>. Inspired by 3Blue1Brown. <a href="https://github.com/davidyusaku/wrdlslvr" class="footer-link" target="_blank">GitHub</a></p>
     </footer>
   </div>
 

@@ -392,7 +392,7 @@ function renderSuggestions(suggestions, remainingCount) {
   if (guesses.length === 0) {
     statusInfoBox.style.border = "1px solid rgba(139, 92, 246, 0.15)";
     statusInfoBox.style.background = "rgba(139, 92, 246, 0.05)";
-    statusInfoText.innerHTML = `Opening solver loaded with <strong>${remainingCount.toLocaleString()}</strong> target words. The best opening recommendation is <strong>TARES</strong>.`;
+    statusInfoText.innerHTML = `Opening solver loaded with <strong>${remainingCount.toLocaleString()}</strong> target words. The best opening recommendation is <strong>${suggestions[0]?.word || "TARES"}</strong>.`;
   } else {
     statusInfoBox.style.border = "1px solid var(--border-neon-dim)";
     statusInfoBox.style.background = "rgba(0, 230, 118, 0.03)";
@@ -449,6 +449,5 @@ function clearAll() {
   activeCol = 0;
   
   setupBoard();
-  setupKeyboard();
   triggerSolve();
 }
