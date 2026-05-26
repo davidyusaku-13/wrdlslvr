@@ -29,8 +29,8 @@ export function getFeedback(guess: string, secret: string): string {
 
   // Second pass: Mark Yellow (correct letter, wrong spot)
   for (let i = 0; i < 5; i++) {
-    if (guessLetters[i] === "") continue; // Already green
     const letter = guessLetters[i];
+    if (letter === "" || letter === undefined) continue; // Already green or consumed
     const index = secretLetters.indexOf(letter);
     if (index !== -1) {
       feedback[i] = "Y";
@@ -58,9 +58,9 @@ export function filterWords(words: string[], guesses: Guess[]): string[] {
 function feedbackToId(f: string): number {
   let id = 0;
   for (let i = 0; i < 5; i++) {
-    const char = f.charCodeAt(i);
+    const ch = f.charAt(i);
     // 'G' -> 2, 'Y' -> 1, 'X' -> 0
-    const val = char === 71 ? 2 : char === 89 ? 1 : 0;
+    const val = ch === "G" ? 2 : ch === "Y" ? 1 : 0;
     id = id * 3 + val;
   }
   return id;
@@ -90,6 +90,16 @@ export function getRecommendations(
   guesses: Guess[],
   limit = 20
 ): { remainingCount: number; suggestions: Recommendation[] } {
+  // Validate all guesses have correct format
+  for (const g of guesses) {
+    if (!/^[a-z]{5}$/.test(g.word)) {
+      throw new Error(`Invalid guess word "${g.word}" — must be 5 lowercase letters`);
+    }
+    if (!/^[GXY]{5}$/.test(g.feedback)) {
+      throw new Error(`Invalid feedback "${g.feedback}" for guess "${g.word}" — must be 5 chars of G/Y/X`);
+    }
+  }
+
   // 1. Get remaining possible answers
   const remaining = filterWords(solutions, guesses);
   const totalAnswers = remaining.length;
@@ -119,9 +129,15 @@ export function getRecommendations(
   }
 
   // 4. Calculate entropy for all candidate words.
+  // We use a CPU time budget (~8ms) to avoid exceeding Cloudflare Workers' CPU limit.
+  // If the budget is exceeded mid-evaluation, we return the best candidates found so far.
+  const TIME_BUDGET_MS = 8;
+  const CANDIDATE_BUDGET = 600;
+  const startTime = performance.now();
+
   // To keep responsiveness high, if the remaining list is still large (e.g. > 400),
   // we compute entropy for all remaining possible answers AND a pruned list of allowed guesses.
-  // Otherwise, we evaluate all 12,953 allowed guesses for the mathematically optimal move.
+  // Otherwise, we evaluate up to CANDIDATE_BUDGET candidates.
   const candidatesToEvaluate: string[] = [];
   const isLarge = totalAnswers > 400;
 
@@ -134,16 +150,32 @@ export function getRecommendations(
     for (const op of PRECOMPUTED_OPENERS) {
       candidatesSet.add(op.word);
     }
-    // Also add a sample of 200 allowed guesses to offer good out-of-pool choices
-    let step = Math.floor(allowedGuesses.length / 200);
-    if (step < 1) step = 1;
-    for (let i = 0; i < allowedGuesses.length; i += step) {
+    // Also add a diverse sample of 200 allowed guesses to offer good out-of-pool choices.
+    // Use a random-offset systematic sample so no word is permanently excluded.
+    const sampleCount = Math.min(200, allowedGuesses.length);
+    const step = Math.floor(allowedGuesses.length / sampleCount);
+    const startOffset = Math.floor(Math.random() * step);
+    for (let i = startOffset; i < allowedGuesses.length; i += step) {
       candidatesSet.add(allowedGuesses[i]!);
     }
     candidatesToEvaluate.push(...candidatesSet);
   } else {
-    // When candidates are few, evaluate ALL 12,953 allowed guesses to find the absolute mathematically best word
-    candidatesToEvaluate.push(...allowedGuesses);
+    // When candidates are few, evaluate remaining solutions + a sample of allowed guesses
+    // within the candidate budget to stay under the CPU time limit.
+    const candidatesSet = new Set<string>(remaining);
+    for (const op of PRECOMPUTED_OPENERS) {
+      candidatesSet.add(op.word);
+    }
+    const remainingBudget = Math.max(0, CANDIDATE_BUDGET - candidatesSet.size);
+    if (remainingBudget > 0) {
+      const sampleSize = Math.min(remainingBudget, allowedGuesses.length);
+      const step = Math.max(1, Math.floor(allowedGuesses.length / sampleSize));
+      const startOffset = Math.floor(Math.random() * step);
+      for (let i = startOffset; i < allowedGuesses.length && candidatesSet.size < CANDIDATE_BUDGET; i += step) {
+        candidatesSet.add(allowedGuesses[i]!);
+      }
+    }
+    candidatesToEvaluate.push(...candidatesSet);
   }
 
   // Map to store possible answers for fast lookup
@@ -153,7 +185,15 @@ export function getRecommendations(
   // Buffer counts array to prevent memory allocation in loops
   const counts = new Uint32Array(243);
 
+  let candidateIndex = 0;
+  const sortKeys: number[] = [];
+
   for (const guessWord of candidatesToEvaluate) {
+    // Check CPU budget every 50 candidates; stop if near limit
+    if (++candidateIndex % 50 === 0 && performance.now() - startTime > TIME_BUDGET_MS) {
+      break;
+    }
+
     // Reset counts buffer
     counts.fill(0);
 
@@ -161,7 +201,7 @@ export function getRecommendations(
     for (const secret of remaining) {
       const f = getFeedback(guessWord, secret);
       const id = feedbackToId(f);
-      counts[id]++;
+      counts[id]!++;
     }
 
     // Compute expected entropy and expected remaining words
@@ -169,7 +209,7 @@ export function getRecommendations(
     let expectedRemaining = 0;
 
     for (let i = 0; i < 243; i++) {
-      const count = counts[i];
+      const count = counts[i]!;
       if (count > 0) {
         const p = count / totalAnswers;
         entropy -= p * Math.log2(p);
@@ -188,17 +228,18 @@ export function getRecommendations(
       entropy: Math.round(entropy * 100) / 100,
       isPossibleAnswer: isPossible,
       expectedRemaining: Math.round(expectedRemaining * 10) / 10,
-      // Store temporary sorting value
-      _sort: sortingEntropy
-    } as any);
+    });
+    sortKeys.push(sortingEntropy);
   }
 
-  // Sort: higher entropy first, then expected remaining words (lower first)
-  recommendations.sort((a: any, b: any) => b._sort - a._sort);
+  // Sort by sortKeys descending (higher entropy first)
+  const sortedIndices = recommendations.map((_, i) => i);
+  sortedIndices.sort((a, b) => (sortKeys[b] ?? 0) - (sortKeys[a] ?? 0));
+  const sorted = sortedIndices.map((i) => recommendations[i]!);
 
   // Return the top N suggestions
   return {
     remainingCount: totalAnswers,
-    suggestions: recommendations.slice(0, limit)
+    suggestions: sorted.slice(0, limit)
   };
 }
